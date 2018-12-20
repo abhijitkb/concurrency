@@ -49,9 +49,12 @@ public final class PrintSeriesSeqentially {
         TimeUnit.SECONDS.sleep(1);
 
         // Signal the first thread to start
-        this.lock.lockInterruptibly();
-        conditions.get(0).signal();
-        this.lock.unlock();
+        try {
+            this.lock.lockInterruptibly();
+            conditions.get(0).signal();
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     public void stop() {
@@ -92,8 +95,7 @@ public final class PrintSeriesSeqentially {
                 } catch (InterruptedException e) {
                     // just wake up to see if the task has been cancelled!
                 } finally {
-                    if(lock.isLocked())
-                        lock.unlock();
+                    lock.unlock();
                 }
             }
         }
